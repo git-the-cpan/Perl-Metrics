@@ -1,0 +1,26 @@
+name: Perl-Metrics
+version: 0.02
+abstract: The Perl Code Metrics System
+author: Adam Kennedy <cpan@ali.as>
+license: perl
+distribution_type: module
+build_requires:
+  Test::More: 0.47
+  File::Spec: 0.80
+requires:
+  perl: 5.005
+  Carp: 0
+  List::Util: 1.15
+  Class::Inspector: 1.12
+  Params::Util: 0.06
+  File::Find::Rule: 0
+  Module::Pluggable: 2.2
+  DBI: 1.143
+  DBD::SQLite: 1.08
+  Class::DBI: 3.0.9
+  PPI: 1.102
+no_index:
+  directory:
+    - t.data
+    - inc
+generated_by: Module::Install version 0.370

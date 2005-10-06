@@ -1,0 +1,9 @@
+Revision history for Perl extension Perl::Metrics
+
+0.02 Wed Oct  5 2005
+	- Released for initial public review.
+	- Got connection and database creation working.
+	- Doesn't do anything yet, but the database does exist.
+
+0.01 Mon Oct  3 2005
+	- Experimental internal release
