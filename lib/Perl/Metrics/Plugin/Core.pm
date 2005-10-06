@@ -17,6 +17,11 @@ use strict;
 use base 'Perl::Metrics::Plugin';
 use List::Util ();
 
+use vars qw{$VERSION};
+BEGIN {
+	$VERSION = '0.03';
+}
+
 =pod
 
 =head1 METRICS

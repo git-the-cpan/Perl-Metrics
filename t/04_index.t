@@ -44,7 +44,7 @@ ok( -r $test_file_abs, 'Test file is readable (absolute path)' );
 
 # Because the hex_id assumes unix newlines, we should be able to 
 # know the hex_id of the file in advance accurately.
-my $hex_id = 'e6469c9e35b376ccaeca9afad62b0f47';
+my $hex_id = 'e9ef626212b3ef354d1786474431fe81';
 
 
 
@@ -77,7 +77,7 @@ is( $object->path, $test_file_abs, '->path matches the file name' );
 
 
 # Inserting an entire directory
-my $hex_hello_world = '6545e839100e3ed524fa9c5b510a2a4e';
+my $hex_hello_world = '8e0554faf1a91139b7f15a77df117542';
 my $count = Perl::Metrics->index_directory( $test_dir_abs );
 is( $count, 3, '->index_directory adds 3 files' );
 my @objects = Perl::Metrics::File->retrieve_all;

@@ -1,5 +1,9 @@
 Revision history for Perl extension Perl::Metrics
 
+0.03 Thu Oct  6 2005
+	- There was a bug in PPI 1.102 functions we need.
+	- Updated dependency to PPI 1.103
+
 0.02 Wed Oct  5 2005
 	- Released for initial public review.
 	- Got connection and database creation working.

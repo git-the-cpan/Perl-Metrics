@@ -1,5 +1,5 @@
 name: Perl-Metrics
-version: 0.02
+version: 0.03
 abstract: The Perl Code Metrics System
 author: Adam Kennedy <cpan@ali.as>
 license: perl
@@ -13,12 +13,12 @@ requires:
   List::Util: 1.15
   Class::Inspector: 1.12
   Params::Util: 0.06
-  File::Find::Rule: 0
+  File::Find::Rule: 0.20
   Module::Pluggable: 2.2
   DBI: 1.143
   DBD::SQLite: 1.08
   Class::DBI: 3.0.9
-  PPI: 1.102
+  PPI: 1.103
 no_index:
   directory:
     - t.data
