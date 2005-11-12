@@ -1,5 +1,8 @@
 Revision history for Perl extension Perl::Metrics
 
+0.05 Sun Nov 13 2005
+	- Various tweaks and bug fixes
+
 0.04 Wed Nov  8 2005
 	- Added an undocumented tracing option
 	- Added a custom cascading delete for files

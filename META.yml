@@ -1,5 +1,5 @@
 name: Perl-Metrics
-version: 0.04
+version: 0.05
 abstract: The Perl Code Metrics System
 author: Adam Kennedy <cpan@ali.as>
 license: perl

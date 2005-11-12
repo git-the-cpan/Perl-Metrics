@@ -71,7 +71,7 @@ use Params::Util     '_IDENTIFIER',
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.04';
+	$VERSION = '0.05';
 }
 
 
@@ -168,12 +168,16 @@ This process may take some time for large indexes.
 =cut
 
 sub process_index {
-	my $self     = shift;
-	my $iterator = Perl::Metrics::File->retrieve_all;
-	while ( my $file = $iterator->next ) {
+	my $self  = shift;
+	my @files = Perl::Metrics::File->retrieve_all;
+	@files = sort { $a->path cmp $b->path } @files;
+	while ( my $file = shift @files ) {
 		Perl::Metrics->_trace("Processing $file... ");
-		$self->process_file( $file );
-		Perl::Metrics->_trace("done.\n");
+		if ( $self->process_file($file) ) {
+			Perl::Metrics->_trace("done.\n");
+		} else {
+			Perl::Metrics->_trace("error.\n");
+		}
 	}
 	1;
 }
@@ -207,8 +211,9 @@ sub process_file {
 		'package' => $self->class,
 		);
 
-	# Start with each of the metrics we already have
-	my $Document = '';
+	# Deal with the existing metrics objects that do not
+	# require the Document in order to be processed.
+	my @todo = ();
 	foreach my $object ( @objects ) {
 		my $name = $object->name;
 
@@ -237,10 +242,33 @@ sub process_file {
 			next;
 		}
 
+		# To do in the next pass
+		push @todo, $object;
+	}
+
+	# Shortcut return now if nothing left to do
+	unless ( @todo or keys %metrics ) {
+		return 1;
+	}
+
+	# Any further metrics will need the document
+	my $Document = eval { $file->Document };
+	if ( $@ or ! $Document ) {
+		# The document has gone unparsable. If this
+		# is due to a PPI upgrade breaking something, we 
+		# need to flush out any existing metrics for the
+		# document, then skip on to the next file
+		$file->metrics->delete_all;
+		return 0;
+	}
+
+	# Now we have the document, update the remaining metrics
+	foreach my $object ( @todo ) {
+		my $name = $object->name;
+
 		# Versions differ, or it has changed from defined to
 		# not, or back the front.
 		$object->version($metrics{$name});
-		$Document ||= $file->Document;
 		my $value = $self->_metric($Document, $name);
 		$object->value($value);
 		$object->update;
@@ -249,7 +277,6 @@ sub process_file {
 
 	# With the existing ones out the way, generate the new ones
 	foreach my $name ( sort keys %metrics ) {
-		$Document ||= $file->Document;
 		my $value = $self->_metric($Document, $name);
 		Perl::Metrics::Metric->insert( {
 			hex_id  => $file->hex_id,
@@ -260,8 +287,7 @@ sub process_file {
 			} );
 	}
 
-	# Done
-	return 1;
+	1;
 }
 
 1;
