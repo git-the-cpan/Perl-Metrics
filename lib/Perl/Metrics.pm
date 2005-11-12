@@ -74,9 +74,13 @@ use File::Find::Rule ();
 use constant FFR => 'File::Find::Rule';
 use Module::Pluggable;
 
-use vars qw{$VERSION};
+use vars qw{$VERSION $TRACE};
 BEGIN {
-	$VERSION = '0.03';
+	$VERSION = '0.04';
+	
+	# Enable the trace flag to show trace messages during the
+	# main processing loops in this class
+	$TRACE   = 0 unless defined $TRACE;
 }
 
 # Perl file searcher
@@ -110,6 +114,7 @@ use Perl::Metrics::CDBI   ();
 use Perl::Metrics::File   ();
 use Perl::Metrics::Metric ();
 use Perl::Metrics::Plugin ();
+
 
 
 
@@ -188,6 +193,8 @@ sub index_file {
 	Carp::croak("Cannot index '$path'. No read permissions") unless -r _;
 	my @f = stat(_);
 
+	$class->_trace("Indexing $path... ");
+
 	# Get the current record, if it exists
 	my $file = Perl::Metrics::File->retrieve( $path );
 
@@ -195,6 +202,7 @@ sub index_file {
 	# is higher than the mtime of the file, the existing
 	# hex_id is corrent and we can shortcut.
 	if ( $file and $file->checked > $f[9] ) {
+		$class->_trace("unchanged.\n");
 		return $file;
 	}
 
@@ -205,11 +213,13 @@ sub index_file {
 
 	if ( $file ) {
 		# Update the record to the new values
+		$class->_trace("updating.\n");
 		$file->checked(time);
 		$file->hex_id($md5hex);
 		$file->update;
 	} else {
 		# Create a new record
+		$class->_trace("inserting.\n");
 		$file = Perl::Metrics::File->insert( {
 			path    => $path,
 			checked => time,
@@ -248,7 +258,16 @@ sub index_directory {
 	Carp::croak("Cannot index '$path'. No enter permissions")     unless -x _;
 
 	# Search for all the applicable files in the directory
+	$class->_trace("Search for files in $path...\n");
 	my @files = $FIND_PERL->in( $path );
+	$class->_trace("Found " . scalar(@files) . " file(s).\n");
+	if ( $TRACE ) {
+		# Only sort if someone is watching, so that have some idea
+		# of our progress.
+		$class->_trace("Sorting files...\n");
+		@files = sort @files;
+	}
+	$class->_trace("Indexing files...\n");
 	foreach my $file ( @files ) {
 		$class->index_file( $file );
 	}
@@ -267,10 +286,11 @@ currently in the index.
 =cut
 
 sub process_index {
-	my $class   = shift;
+	my $class = shift;
 
 	# Create the plugin objects
 	foreach my $plugin ( $class->plugins ) {
+		$class->_trace("STARTING PLUGIN $plugin...\n");
 		eval "require $plugin";
 		die $@ if $@;
 		$plugin->new->process_index;
@@ -293,6 +313,19 @@ sub process_directory {
 	my $class = shift;
 	$class->index_directory( $_[0] );
 	$class->process_index;
+}
+
+
+
+
+
+#####################################################################
+# Support Methods
+
+sub _trace {
+	my $class = shift;
+	return 1 unless $TRACE;
+	print @_;
 }
 
 1;

@@ -25,7 +25,7 @@ use base 'Perl::Metrics::CDBI';
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.03';
+	$VERSION = '0.04';
 }
 
 
@@ -62,6 +62,22 @@ Perl::Metrics::File->columns( Essential =>
 	'hex_id',  # Document MD5 Identifier        - 'abcdef1234567890'
 	);
 
+# Add custom deletion cascade
+Perl::Metrics::File->add_trigger(
+	before_delete => sub { $_[0]->before_delete },
+	);
+sub before_delete {
+	my $self = shift;
+
+	if ( $self->search( hex_id => $self->hex_id )->count == 1 ) {
+		# We are the last file with this hex_id.
+		# Remove any metrics that were accumulated.
+		$self->metrics->delete_all;
+	}
+
+	1;
+}
+
 =pod
 
 =head2 metrics @options
@@ -82,7 +98,9 @@ sub metrics {
 	}
 
 	# Execute the search
-	Perl::Metrics::Metric->search( @params );
+	return wantarray
+		? Perl::Metrics::Metric->search( @params )
+		: scalar Perl::Metrics::Metric->search( @params );
 }
 
 =pod

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Create a new database when opening a file that doesn't exist
+# Test the basic operations of plugins
 
 use strict;
 use lib ();
@@ -16,7 +16,7 @@ BEGIN {
 	}
 }
 
-use Test::More tests => 20;
+use Test::More tests => 16;
 
 
 
@@ -52,9 +52,9 @@ is( ref($metrics), 'HASH', '->metrics returns a hash' );
 ok( $core->process_index, '->process_index returns true' );
 
 my @metrics = Perl::Metrics::Metric->retrieve_all( { order_by => 'hex_id, package, name' } );
-is( scalar(@metrics), 8, '4 metrics on 3 files makes 8 metric objects, correctly' );
+is( scalar(@metrics), 4, '2 metrics on 3 files makes 4 metric objects, correctly' );
 
-my @vals = ( 0, 0, 8, 15, 17, 1, 12, 25 );
+my @vals = ( 8, 15, 12, 25 );
 foreach ( @metrics ) {
 	my $hex_id = $_->hex_id;
 	my $name   = $_->name;

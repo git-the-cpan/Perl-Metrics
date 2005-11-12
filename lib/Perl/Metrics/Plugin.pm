@@ -71,7 +71,7 @@ use Params::Util     '_IDENTIFIER',
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.03';
+	$VERSION = '0.04';
 }
 
 
@@ -171,7 +171,9 @@ sub process_index {
 	my $self     = shift;
 	my $iterator = Perl::Metrics::File->retrieve_all;
 	while ( my $file = $iterator->next ) {
+		Perl::Metrics->_trace("Processing $file... ");
 		$self->process_file( $file );
+		Perl::Metrics->_trace("done.\n");
 	}
 	1;
 }
@@ -191,10 +193,19 @@ sub process_file {
 	my $file = _INSTANCE(shift, 'Perl::Metrics::File')
 		or Carp::croak("Did not pass a Perl::Metrics::File to process_file");
 
+	# Has the file been removed since the last run
+	unless ( -f $file->path ) {
+		# Delete the file entry
+		$file->delete;
+		return 1;
+	}
+
 	# Get the metric list for the plugin, and the
 	# database Metric data for this file.
 	my %metrics = %{$self->metrics}; # Copy so we can destroy
-	my @objects = $file->metrics( package => $self->class );
+	my @objects = $file->metrics(
+		'package' => $self->class,
+		);
 
 	# Start with each of the metrics we already have
 	my $Document = '';

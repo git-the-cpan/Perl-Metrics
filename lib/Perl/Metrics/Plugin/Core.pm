@@ -11,6 +11,13 @@ Perl::Metrics::Plugin::Core - The Core Perl Metrics Package
 This class provides a set of core metrics for Perl documents, based on
 very simple code using only the core L<PPI> package.
 
+=head1 METRICS
+
+As with all L<Perl::Metrics::Plugin> packages, all metrics can be
+referenced with the global identifier C<Perl::Metrics::Plugin::Core::metric>.
+
+Metrics are listed as "datatype name".
+
 =cut
 
 use strict;
@@ -19,17 +26,10 @@ use List::Util ();
 
 use vars qw{$VERSION};
 BEGIN {
-	$VERSION = '0.03';
+	$VERSION = '0.04';
 }
 
 =pod
-
-=head1 METRICS
-
-As with all L<Perl::Metrics::Plugin> packages, all metrics can be
-referenced with the global identifier C<Perl::Metrics::Plugin::Core::metric>.
-
-Metrics are listed as "datatype name".
 
 =head2 integer tokens 
 
@@ -65,42 +65,6 @@ For more information on significance, see L<PPI::Element/significant>.
 sub metric_significant_tokens {
 	my ($self, $Document) = @_;
 	scalar grep { $_->significant } $Document->tokens;
-}
-
-=pod
-
-=head2 integer comment_tokens
-
-The C<comment_tokens> metric represents the total number of
-L<PPI::Token::Comment> objects contained in a document.
-
-=cut
-
-sub metric_comment_tokens {
-	my ($self, $Document) = @_;
-	scalar grep { $_->isa('PPI::Token::Comment') } $Document->tokens;
-}
-
-=pod
-
-=head2 integer comment_chars
-
-The C<comment_chars> metric represents the total number of characters
-of comment content (ignoring the leading # and leading/trailing whitespace)
-
-=cut
-
-sub metric_comment_chars {
-	my ($self, $Document) = @_;
-	my $chars = List::Util::sum map { length $_ }
-		grep { s/^#//s; s/^\s+//s; s/\s+$//s; 1; }
-		map  { $_->content }
-		grep { $_->isa('PPI::Token::Comment') }
-		$Document->tokens;
-
-	# List::Util::sum for a null list returns undef,
-	# so we need to convert it to zero.
-	defined($chars) ? $chars : 0;
 }
 
 1;

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Create a new database when opening a file that doesn't exist
+# Index a file
 
 use strict;
 use lib ();
@@ -16,7 +16,9 @@ BEGIN {
 	}
 }
 
-use Test::More tests => 27;
+use Test::More tests => 29;
+
+
 
 
 
@@ -31,6 +33,8 @@ ok( -x $test_dir, 'Test directory enter permissions ok'   );
 ok( ! -f $test_create, 'Test database does not exist yet' );
 END { unlink $test_create if -f $test_create; }
 use_ok( 'Perl::Metrics', $test_create );
+
+
 
 
 
@@ -73,6 +77,14 @@ my $object2 = Perl::Metrics::File->retrieve( $test_file_abs );
 isa_ok( $object, 'Perl::Metrics::File' );
 is( $object->path, $test_file_abs, '->path matches the file name' );
 
+# Check that the ::File->metrics method works correctly in both
+# scalar and list forms.
+my $metrics_scalar = $object2->metrics;
+isa_ok( $metrics_scalar, 'Class::DBI::Iterator' );
+my @metrics_list = $object->metrics;
+is_deeply( \@metrics_list, [ ], '->metrics in list form returns no objects' );
+
+
 
 
 
@@ -84,6 +96,7 @@ my @objects = Perl::Metrics::File->retrieve_all;
 is( scalar(@objects), 3, 'Total of 3 despite only 3 added' );
 @objects = Perl::Metrics::File->search( hex_id => $hex_hello_world );
 is( scalar(@objects), 2, 'Multiple files get the same hex_id when expected' );
+
 
 
 
