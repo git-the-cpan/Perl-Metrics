@@ -65,6 +65,7 @@ all.
 
 =cut
 
+use 5.005;
 use strict;
 use Carp             ();
 use DBI              ();
@@ -76,7 +77,7 @@ use Module::Pluggable;
 
 use vars qw{$VERSION $TRACE};
 BEGIN {
-	$VERSION = '0.05';
+	$VERSION = '0.06';
 	
 	# Enable the trace flag to show trace messages during the
 	# main processing loops in this class
@@ -261,12 +262,12 @@ sub index_directory {
 	$class->_trace("Search for files in $path...\n");
 	my @files = $FIND_PERL->in( $path );
 	$class->_trace("Found " . scalar(@files) . " file(s).\n");
-	if ( $TRACE ) {
-		# Only sort if someone is watching, so that have some idea
-		# of our progress.
-		$class->_trace("Sorting files...\n");
-		@files = sort @files;
-	}
+
+	# Sort the files so we index in deterministic order
+	$class->_trace("Sorting files...\n");
+	@files = sort @files;
+
+	# Index the files
 	$class->_trace("Indexing files...\n");
 	foreach my $file ( @files ) {
 		$class->index_file( $file );
