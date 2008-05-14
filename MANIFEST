@@ -24,7 +24,9 @@ t/03_open.t
 t/04_index.t
 t/05_plugins.t
 t/06_process.t
-t/99_pod.t
+t/97_meta.t
+t/98_pod.t
+t/99_pmv.t
 t/data/Foo.pm
 t/data/Hello.pm
 t/data/metrics.sqlite
