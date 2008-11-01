@@ -65,7 +65,7 @@ all.
 
 =cut
 
-use 5.005;
+use 5.00503;
 use strict;
 use Carp                   ();
 use DBI                    ();
@@ -77,7 +77,7 @@ use Module::Pluggable;
 
 use vars qw{$VERSION $TRACE};
 BEGIN {
-	$VERSION = '0.08';
+	$VERSION = '0.09';
 	
 	# Enable the trace flag to show trace messages during the
 	# main processing loops in this class
@@ -107,7 +107,6 @@ use Perl::Metrics::CDBI   ();
 use Perl::Metrics::File   ();
 use Perl::Metrics::Metric ();
 use Perl::Metrics::Plugin ();
-
 
 
 
